@@ -17,7 +17,8 @@ LCGA_GMM_sim(
   var_s,
   cov_is,
   mean_r,
-  var_r
+  var_r,
+  mod_name = NA_character_
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ LCGA_GMM_sim(
 \item{mean_r}{Mean of the Gaussian noise added to the response variable.}
 
 \item{var_r}{Variance of the Gaussian noise added to the response variable.}
+
+\item{mod_name}{A model identifier}
 }
 \value{
 A data frame with the simulated longitudinal data.
