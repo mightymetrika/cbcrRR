@@ -14,7 +14,8 @@ test_that("Test LCGA_GMM function using Wardenaar, 2022 working paper Appendix 1
     var_s=0.09,
     cov_is=0,
     mean_r=0,
-    var_r=1)
+    var_r=1,
+    mod_name = "test")
 
   expect_equal(2 * 2, 4)
 })

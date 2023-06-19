@@ -21,6 +21,7 @@
 #' @param cov_is Covariance between the random intercepts and slopes.
 #' @param mean_r Mean of the Gaussian noise added to the response variable.
 #' @param var_r Variance of the Gaussian noise added to the response variable.
+#' @param mod_name A model identifier
 #'
 #' @return A data frame with the simulated longitudinal data.
 #' Each row corresponds to one time point for one individual.
@@ -42,7 +43,8 @@
 #' var_s = 1, cov_is = 0, mean_r = 0, var_r = 1)
 #' head(sim_data)
 LCGA_GMM_sim <- function(n_pers, n_time, beta_int, beta_slo_time, beta_slo_covar,
-                    beta_slo_interact, mean_i, var_i, mean_s, var_s, cov_is, mean_r, var_r) {
+                         beta_slo_interact, mean_i, var_i, mean_s, var_s, cov_is,
+                         mean_r, var_r, mod_name = NA_character_) {
 
   REff = MASS::mvrnorm(n_pers, mu=c(mean_i,mean_s), Sigma=rbind(c(var_i, cov_is),
                                                           c(cov_is, var_s) ))
@@ -57,7 +59,8 @@ LCGA_GMM_sim <- function(n_pers, n_time, beta_int, beta_slo_time, beta_slo_covar
                   slo = rep(REff[,2], each=n_time),
                   slo_cov=rep(beta_slo_covar, each=n_time),
                   slo_interact=rep(beta_slo_interact, each=n_time),
-                  y = NA)
+                  y = NA,
+                  mod_name = mod_name)
 
   dat$time <- dat$time-1
   dat$interact <- dat$time*dat$covar
