@@ -50,3 +50,38 @@ run_lme4_models <- function(sim_data) {
 
   return(model_outs)
 }
+
+
+run_lm_models <- function(sim_data) {
+
+  # List to store model results
+  model_outs <- list()
+
+  # Simple linear model w/ no interaction
+  model_1 <- stats::lm(y ~ time + covar, data = sim_data)
+  model_outs$ols_no_int <- model_1
+
+  # Simple linear model w/ interaction
+  model_2 <- stats::lm(y ~ time * covar, data = sim_data)
+  model_outs$ols_int <- model_2
+
+  return(model_outs)
+}
+
+
+# run_cbc_lm_models <- function(sim_data){
+#
+#   # List to store model results
+#   model_outs <- list()
+#
+#   # Simple linear model w/ no interaction
+#   model_1 <- stats::lm(y ~ time + covar, data = sim_data)
+#   model_outs$ols_no_int <- model_1
+#
+#   # Simple linear model w/ interaction
+#   model_2 <- stats::lm(y ~ time * covar, data = sim_data)
+#   model_outs$ols_int <- model_2
+#
+#   return(model_outs)
+#
+# }
