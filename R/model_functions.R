@@ -68,18 +68,20 @@ run_lm_models <- function(sim_data) {
   return(model_outs)
 }
 
-
+#
 # run_cbc_lm_models <- function(sim_data){
+#
+#   ### May need to fix error associated with including covars ###
 #
 #   # List to store model results
 #   model_outs <- list()
 #
 #   # Simple linear model w/ no interaction
-#   model_1 <- stats::lm(y ~ time + covar, data = sim_data)
+#   model_1 <- OLStrajr::cbc_lm(formula = y ~ time + covar, .case = "ID", data = sim_data)
 #   model_outs$ols_no_int <- model_1
 #
 #   # Simple linear model w/ interaction
-#   model_2 <- stats::lm(y ~ time * covar, data = sim_data)
+#   model_2 <- OLStrajr::cbc_lm(formula = y ~ time*covar, .case = "ID", data = sim_data)
 #   model_outs$ols_int <- model_2
 #
 #   return(model_outs)

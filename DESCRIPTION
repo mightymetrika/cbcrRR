@@ -15,6 +15,7 @@ Imports:
     lcmm,
     lme4,
     MASS,
+    OLStrajr,
     tidyr
 Suggests: 
     testthat (>= 3.0.0)
