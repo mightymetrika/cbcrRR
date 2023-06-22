@@ -15,7 +15,7 @@ Imports:
     lcmm,
     lme4,
     MASS,
-    OLStrajr (>= 0.1.0),
+    OLStrajr (>= 0.1.0.9000),
     tidyr
 Suggests: 
     testthat (>= 3.0.0)
