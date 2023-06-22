@@ -91,25 +91,59 @@ run_lm_models <- function(sim_data) {
   return(model_outs)
 }
 
+# run_cbc_lm_models <- function(sim_data, stop_zeroSD = TRUE){
+#
+#   # Function to fit a model and handle potential errors
+#   fit_model <- function(formula, data, stop_zeroSD) {
+#     tryCatch({
+#       OLStrajr::cbc_lm(formula = formula, .case = "ID", data = data, stop_zeroSD = stop_zeroSD)
+#     }, error = function(e) {
+#       if (stop_zeroSD == FALSE) {
+#         warning(paste("Could not fit model with formula:", formula, ": ", e$message))
+#         return(NULL)
+#       } else {
+#         stop(e)
+#       }
+#     })
+#   }
+#
+#   # List to store model results
+#   model_outs <- list()
+#
+#   # Simple linear model w/ no interaction or covar
+#   model_outs$ols_no_intco <- fit_model(formula = y ~ time, data = sim_data, stop_zeroSD = stop_zeroSD)
+#
+#   # Simple linear model w/ no interaction
+#   model_outs$ols_no_int <- fit_model(formula = y ~ time + covar, data = sim_data, stop_zeroSD = stop_zeroSD)
+#
+#   # Simple linear model w/ interaction
+#   model_outs$ols_int <- fit_model(formula = y ~ time*covar, data = sim_data, stop_zeroSD = stop_zeroSD)
+#
+#   return(model_outs)
+# }
 
-run_cbc_lm_models <- function(sim_data){
 
-  # List to store model results
-  model_outs <- list()
 
-  # Simple linear model w/ no interaction or covar
-  model_1 <- OLStrajr::cbc_lm(formula = y ~ time, .case = "ID", data = sim_data)
-  model_outs$ols_no_intco <- model_1
-
-  # ### NEED TO FIX TRY CATCH IN OLStrajr BEFORE FINALIZING THIS SECTION ###
-  # # Simple linear model w/ no interaction
-  # model_2 <- OLStrajr::cbc_lm(formula = y ~ time + covar, .case = "ID", data = sim_data)
-  # model_outs$ols_no_int <- model_2
-  #
-  # # Simple linear model w/ interaction
-  # model_3 <- OLStrajr::cbc_lm(formula = y ~ time*covar, .case = "ID", data = sim_data)
-  # model_outs$ols_int <- model_3
-
-  return(model_outs)
-
-}
+# run_cbc_lm_models <- function(sim_data, stop_zeroSD = TRUE){
+#
+#   # List to store model results
+#   model_outs <- list()
+#
+#   # Simple linear model w/ no interaction or covar
+#   model_1 <- OLStrajr::cbc_lm(formula = y ~ time, .case = "ID", data = sim_data,
+#                               stop_zeroSD = stop_zeroSD)
+#   model_outs$ols_no_intco <- model_1
+#
+#   # Simple linear model w/ no interaction
+#   model_2 <- OLStrajr::cbc_lm(formula = y ~ time + covar, .case = "ID", data = sim_data,
+#                               stop_zeroSD = stop_zeroSD)
+#   model_outs$ols_no_int <- model_2
+#
+#   # Simple linear model w/ interaction
+#   model_3 <- OLStrajr::cbc_lm(formula = y ~ time*covar, .case = "ID", data = sim_data,
+#                               stop_zeroSD = stop_zeroSD)
+#   model_outs$ols_int <- model_3
+#
+#   return(model_outs)
+#
+# }
