@@ -15,8 +15,10 @@ Imports:
     lcmm,
     lme4,
     MASS,
-    OLStrajr,
+    OLStrajr (>= 0.1.0),
     tidyr
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Remotes:  
+    github::mightymetrika/OLStrajr
