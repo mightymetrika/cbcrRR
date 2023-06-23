@@ -1,7 +1,7 @@
 run_lcga_models <- function(sim_data, ng = 1) {
 
   # List to store model results
-  model_outs <- vector("list", 6)
+  model_outs <- list()
 
   # Random intercept model w/ no interaction no covar
   model_outs$ri_no_intco <- lcmm::hlme(y ~ time, random = ~ 1 | ID, subject = 'ID',
@@ -34,7 +34,7 @@ run_lcga_models <- function(sim_data, ng = 1) {
 run_lme4_models <- function(sim_data) {
 
   # List to store model results
-  model_outs <- vector("list", 6)
+  model_outs <- list()
 
   # Random intercept model w/ no interaction or covar
   model_outs$ri_no_intco <- lme4::lmer(y ~ time + (1 | ID), data = sim_data)
@@ -61,7 +61,7 @@ run_lme4_models <- function(sim_data) {
 run_lm_models <- function(sim_data) {
 
   # List to store model results
-  model_outs <-vector("list", 3)
+  model_outs <- list()
 
   # Simple linear model w/ no interaction or covar
   model_outs$ols_no_intco <- stats::lm(y ~ time, data = sim_data)
@@ -92,7 +92,7 @@ run_cbc_lm_models <- function(sim_data, stop_zeroSD = FALSE){
   }
 
   # List to store model results
-  model_outs <- vector("list", 3)
+  model_outs <- list()
 
   # Simple linear model w/ no interaction or covar
   model_outs$ols_no_intco <- fit_model(formula = y ~ time, data = sim_data,

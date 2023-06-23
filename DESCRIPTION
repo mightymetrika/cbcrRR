@@ -14,11 +14,12 @@ BugReports: https://github.com/mightymetrika/cbcrRR/issues
 Imports: 
     lcmm,
     lme4,
+    lmerTest,
     MASS,
     OLStrajr (>= 0.1.0.9000),
     tidyr
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Remotes:  
+Remotes: 
     github::mightymetrika/OLStrajr
