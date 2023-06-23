@@ -4,34 +4,28 @@ run_lcga_models <- function(sim_data, ng = 1) {
   model_outs <- list()
 
   # Random intercept model w/ no interaction no covar
-  model_1 <- lcmm::hlme(y ~ time, random = ~ 1 | ID, subject = 'ID',
-                        data = sim_data, ng = ng)
-  model_outs$ri_no_intco <- model_1
+  model_outs$ri_no_intco <- lcmm::hlme(y ~ time, random = ~ 1 | ID, subject = 'ID',
+                                       data = sim_data, ng = ng)
 
   # Random intercept model w/ no interaction
-  model_2 <- lcmm::hlme(y ~ time + covar, random = ~ 1 | ID, subject = 'ID',
-                        data = sim_data, ng = ng)
-  model_outs$ri_no_int <- model_2
+  model_outs$ri_no_int <- lcmm::hlme(y ~ time + covar, random = ~ 1 | ID, subject = 'ID',
+                                     data = sim_data, ng = ng)
 
   # Random intercept model w/ interaction
-  model_3 <- lcmm::hlme(y ~ time * covar, random = ~ 1 | ID, subject = 'ID',
-                        data = sim_data, ng = ng)
-  model_outs$ri_int <- model_3
+  model_outs$ri_int <- lcmm::hlme(y ~ time * covar, random = ~ 1 | ID, subject = 'ID',
+                                  data = sim_data, ng = ng)
 
   # Random intercept and slope model w/ no interaction no covar
-  model_4 <- lcmm::hlme(y ~ time, random = ~ time | ID, subject = 'ID',
-                        data = sim_data, ng = ng)
-  model_outs$ris_no_intco <- model_4
+  model_outs$ris_no_intco <- lcmm::hlme(y ~ time, random = ~ time | ID, subject = 'ID',
+                                        data = sim_data, ng = ng)
 
   # Random intercept and slope model w/ no interaction
-  model_5 <- lcmm::hlme(y ~ time + covar, random = ~ time | ID, subject = 'ID',
-                        data = sim_data, ng = ng)
-  model_outs$ris_no_int <- model_5
+  model_outs$ris_no_int <- lcmm::hlme(y ~ time + covar, random = ~ time | ID, subject = 'ID',
+                                      data = sim_data, ng = ng)
 
   # Random intercept and slope model w/ interaction
-  model_6 <- lcmm::hlme(y ~ time * covar, random = ~ time | ID, subject = 'ID',
-                        data = sim_data, ng = ng)
-  model_outs$ris_int <- model_6
+  model_outs$ris_int <- lcmm::hlme(y ~ time * covar, random = ~ time | ID, subject = 'ID',
+                                   data = sim_data, ng = ng)
 
   return(model_outs)
 }
@@ -43,28 +37,22 @@ run_lme4_models <- function(sim_data) {
   model_outs <- list()
 
   # Random intercept model w/ no interaction or covar
-  model_1 <- lme4::lmer(y ~ time + (1 | ID), data = sim_data)
-  model_outs$ri_no_intco <- model_1
+  model_outs$ri_no_intco <- lme4::lmer(y ~ time + (1 | ID), data = sim_data)
 
   # Random intercept model w/ no interaction
-  model_2 <- lme4::lmer(y ~ time + covar + (1 | ID), data = sim_data)
-  model_outs$ri_no_int <- model_2
+  model_outs$ri_no_int <- lme4::lmer(y ~ time + covar + (1 | ID), data = sim_data)
 
   # Random intercept model w/ interaction
-  model_3 <- lme4::lmer(y ~ time * covar + (1 | ID), data = sim_data)
-  model_outs$ri_int <- model_3
+  model_outs$ri_int <- lme4::lmer(y ~ time * covar + (1 | ID), data = sim_data)
 
   # Random intercept and slope model w/ no interaction or covar
-  model_4 <- lme4::lmer(y ~ time + (time | ID), data = sim_data)
-  model_outs$ris_no_intco <- model_4
+  model_outs$ris_no_intco <- lme4::lmer(y ~ time + (time | ID), data = sim_data)
 
   # Random intercept and slope model w/ no interaction
-  model_5 <- lme4::lmer(y ~ time + covar + (time | ID), data = sim_data)
-  model_outs$ris_no_int <- model_5
+  model_outs$ris_no_int <- lme4::lmer(y ~ time + covar + (time | ID), data = sim_data)
 
   # Random intercept and slope model w/ interaction
-  model_6 <- lme4::lmer(y ~ time * covar + (time | ID), data = sim_data)
-  model_outs$ris_int <- model_6
+  model_outs$ris_int <- lme4::lmer(y ~ time * covar + (time | ID), data = sim_data)
 
   return(model_outs)
 }
@@ -76,22 +64,18 @@ run_lm_models <- function(sim_data) {
   model_outs <- list()
 
   # Simple linear model w/ no interaction or covar
-  model_1 <- stats::lm(y ~ time, data = sim_data)
-  model_outs$ols_no_intco <- model_1
-
+  model_outs$ols_no_intco <- stats::lm(y ~ time, data = sim_data)
 
   # Simple linear model w/ no interaction
-  model_2 <- stats::lm(y ~ time + covar, data = sim_data)
-  model_outs$ols_no_int <- model_2
+  model_outs$ols_no_int <- stats::lm(y ~ time + covar, data = sim_data)
 
   # Simple linear model w/ interaction
-  model_3 <- stats::lm(y ~ time * covar, data = sim_data)
-  model_outs$ols_int <- model_3
+  model_outs$ols_int <- stats::lm(y ~ time * covar, data = sim_data)
 
   return(model_outs)
 }
 
-run_cbc_lm_models <- function(sim_data, stop_zeroSD = TRUE){
+run_cbc_lm_models <- function(sim_data, stop_zeroSD = FALSE){
 
   # Function to fit a model and handle potential errors
   fit_model <- function(formula, data, stop_zeroSD) {
@@ -111,13 +95,16 @@ run_cbc_lm_models <- function(sim_data, stop_zeroSD = TRUE){
   model_outs <- list()
 
   # Simple linear model w/ no interaction or covar
-  model_outs$ols_no_intco <- fit_model(formula = y ~ time, data = sim_data, stop_zeroSD = stop_zeroSD)
+  model_outs$ols_no_intco <- fit_model(formula = y ~ time, data = sim_data,
+                                       stop_zeroSD = stop_zeroSD)
 
   # Simple linear model w/ no interaction
-  model_outs$ols_no_int <- fit_model(formula = y ~ time + covar, data = sim_data, stop_zeroSD = stop_zeroSD)
+  model_outs$ols_no_int <- fit_model(formula = y ~ time + covar, data = sim_data,
+                                     stop_zeroSD = stop_zeroSD)
 
   # Simple linear model w/ interaction
-  model_outs$ols_int <- fit_model(formula = y ~ time*covar, data = sim_data, stop_zeroSD = stop_zeroSD)
+  model_outs$ols_int <- fit_model(formula = y ~ time*covar, data = sim_data,
+                                  stop_zeroSD = stop_zeroSD)
 
   return(model_outs)
 }
