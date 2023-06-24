@@ -31,13 +31,37 @@ test_that("extract_lm_info works", {
   expect_equal(length(lm_res), 3)
 })
 
-# test_that("extract_sand_info works", {
+test_that("extract_sand_info works", {
+  set.seed(123)
+  sim_data <- LCGA_GMM_sim(n_pers = 100, n_time = 5, beta_int = 0, beta_slo_time = 1,
+                           beta_slo_covar = 0, beta_slo_interact = 0, mean_i = 0, var_i = 1, mean_s = 0,
+                           var_s = 1, cov_is = 0, mean_r = 0, var_r = 1, mod_name = "test_model")
+
+  lm_mods <- run_lm_models(sim_data = sim_data)
+  sand_res <- extract_sand_info(lm_mods)
+  expect_equal(length(sand_res), 3)
+})
+
+# test_that("extract_cbc_info works", {
 #   set.seed(123)
 #   sim_data <- LCGA_GMM_sim(n_pers = 100, n_time = 5, beta_int = 0, beta_slo_time = 1,
 #                            beta_slo_covar = 0, beta_slo_interact = 0, mean_i = 0, var_i = 1, mean_s = 0,
 #                            var_s = 1, cov_is = 0, mean_r = 0, var_r = 1, mod_name = "test_model")
 #
-#   lm_mods <- run_lm_models(sim_data = sim_data)
-#   sand_res <- extract_sand_info(lm_mods)
-#   expect_equal(length(sand_res), 3)
+#   cbc_mods <- run_cbc_models(sim_data = sim_data)
+#   cbc_res <- extract_cbc_info(cbc_mods)
+#   expect_equal(length(cbc_res), 3)
 # })
+
+
+# test_that("extract_cbcRR_info works", {
+#   set.seed(123)
+#   sim_data <- LCGA_GMM_sim(n_pers = 100, n_time = 5, beta_int = 0, beta_slo_time = 1,
+#                            beta_slo_covar = 0, beta_slo_interact = 0, mean_i = 0, var_i = 1, mean_s = 0,
+#                            var_s = 1, cov_is = 0, mean_r = 0, var_r = 1, mod_name = "test_model")
+#
+#   cbc_mods <- run_cbc_models(sim_data = sim_data)
+#   cbcRR_res <- extract_cbcRR_info(cbc_mods)
+#   expect_equal(length(cbc_res), 3)
+# })
+
