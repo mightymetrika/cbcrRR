@@ -12,11 +12,14 @@ RoxygenNote: 7.2.3
 URL: https://github.com/mightymetrika/cbcrRR
 BugReports: https://github.com/mightymetrika/cbcrRR/issues
 Imports: 
+    broom,
     lcmm,
     lme4,
     lmerTest,
+    lmtest,
     MASS,
     OLStrajr (>= 0.1.0.9000),
+    sandwich,
     tidyr
 Suggests: 
     testthat (>= 3.0.0)
