@@ -75,7 +75,7 @@ run_lm_models <- function(sim_data) {
   return(model_outs)
 }
 
-run_cbc_lm_models <- function(sim_data, stop_zeroSD = FALSE){
+run_cbc_models <- function(sim_data, stop_zeroSD = FALSE){
 
   # Function to fit a model and handle potential errors
   fit_model <- function(formula, data, stop_zeroSD) {
