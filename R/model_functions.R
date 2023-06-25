@@ -75,12 +75,13 @@ run_lm_models <- function(sim_data) {
   return(model_outs)
 }
 
-run_cbc_models <- function(sim_data, stop_zeroSD = FALSE){
+run_cbc_models <- function(sim_data, stop_zeroSD = FALSE, level = 0.95){
 
   # Function to fit a model and handle potential errors
   fit_model <- function(formula, data, stop_zeroSD) {
     tryCatch({
-      OLStrajr::cbc_lm(formula = formula, .case = "ID", data = data, stop_zeroSD = stop_zeroSD)
+      OLStrajr::cbc_lm(formula = formula, .case = "ID", data = data,
+                       stop_zeroSD = stop_zeroSD, boot.ci_options = list(conf = level))
     }, error = function(e) {
       if (stop_zeroSD == FALSE) {
         warning(paste("Could not fit model with formula:", formula, ": ", e$message))
