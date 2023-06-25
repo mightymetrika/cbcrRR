@@ -1,4 +1,4 @@
-extract_lcga_info <- function(model_outs) {
+extract_lcga_info <- function(model_outs, level = 0.95) {
   # Initialize list to store model information
   model_info <- list()
 
@@ -7,8 +7,17 @@ extract_lcga_info <- function(model_outs) {
     # Get the summary of the model
     model_summary <- summary(model_outs[[i]])
 
+    # Calculate confidence intervals
+    model_ci <- stats::confint(model_outs[[i]], level = level)
+    model_ci <- stats::setNames(as.data.frame(model_ci), c("conf.low", "conf.high"))
+    row.names(model_ci) <- make.names(row.names(model_ci), unique = TRUE)
+    model_ci$term <- row.names(model_ci)
+
     # Convert summary to data.frame and add row names as 'term' column
-    model_summary <- data.frame(term = row.names(model_summary), model_summary)
+    model_summary <- data.frame(term = make.names(row.names(model_summary), unique = TRUE), model_summary)
+
+    # Merge model_summary and model_ci
+    model_summary <- merge(model_summary, model_ci, by = "term")
 
     # Reorder the columns so that 'term' is the first column
     model_summary <- model_summary[, c("term", setdiff(names(model_summary), "term"))]
@@ -20,7 +29,7 @@ extract_lcga_info <- function(model_outs) {
   return(model_info)
 }
 
-extract_lme4_info <- function(model_outs) {
+extract_lme4_info <- function(model_outs, level = 0.95) {
 
   # Initialize list to store model information
   model_info <- list()
@@ -35,13 +44,22 @@ extract_lme4_info <- function(model_outs) {
     model_df <- as.data.frame(model_summary$coefficients)
     model_df$term <- row.names(model_summary$coefficients)
 
+    # Calculate confidence intervals
+    model_ci <- stats::confint(model_outs[[i]], level = level)
+    model_ci <- stats::setNames(as.data.frame(model_ci), c("conf.low", "conf.high"))
+    model_ci$term <- row.names(model_ci)
+
     # Change the term from "(Intercept)" to "intercept"
     model_df$term <- gsub("\\(Intercept\\)", "intercept", model_df$term)
+    model_ci$term <- gsub("\\(Intercept\\)", "intercept", model_ci$term)
 
     # Rename columns
     names(model_df)[names(model_df) == "Estimate"] <- "coef"
     names(model_df)[names(model_df) == "Std. Error"] <- "Se"
     names(model_df)[names(model_df) == "Pr(>|t|)"] <- "p.value"
+
+    # Merge model_df and model_ci
+    model_df <- merge(model_df, model_ci, by = "term")
 
     # Reorder the columns so that 'term' is the first column
     model_df <- model_df[, c("term", setdiff(names(model_df), "term"))]
@@ -53,7 +71,7 @@ extract_lme4_info <- function(model_outs) {
   return(model_info)
 }
 
-extract_lm_info <- function(model_outs) {
+extract_lm_info <- function(model_outs, level = 0.95) {
   # Initialize list to store model information
   model_info <- list()
 
@@ -70,8 +88,20 @@ extract_lm_info <- function(model_outs) {
       p.value = model_summary$coefficients[, "Pr(>|t|)"]
     )
 
+    # Calculate confidence intervals
+    model_ci <- stats::confint(model_outs[[i]], level = level)
+    model_ci <- stats::setNames(as.data.frame(model_ci), c("conf.low", "conf.high"))
+    model_ci$term <- row.names(model_ci)
+
     # Change the term from "(Intercept)" to "intercept"
     model_df$term <- gsub("\\(Intercept\\)", "intercept", model_df$term)
+    model_ci$term <- gsub("\\(Intercept\\)", "intercept", model_ci$term)
+
+    # Merge model_df and model_ci
+    model_df <- merge(model_df, model_ci, by = "term")
+
+    # Reorder the columns so that 'term' is the first column
+    model_df <- model_df[, c("term", setdiff(names(model_df), "term"))]
 
     # Store the extracted information in the list
     model_info[[names(model_outs)[i]]] <- model_df
@@ -80,8 +110,7 @@ extract_lm_info <- function(model_outs) {
   return(model_info)
 }
 
-
-extract_sand_info <- function(model_outs) {
+extract_sand_info <- function(model_outs, level = 0.95) {
   # Initialize list to store model information
   model_info <- list()
 
@@ -90,10 +119,12 @@ extract_sand_info <- function(model_outs) {
 
     # Get the summary of the model
     model_summary <- as.data.frame(broom::tidy(lmtest::coeftest(model_outs[[i]],
-                                                                vcov = sandwich::vcovHC, df = Inf)))
+                                                                vcov = sandwich::vcovHC, df = Inf),
+                                               conf.int = TRUE, conf.level = level))
 
     # Set names
-    names(model_summary) <- c("term", "coef", "Se", "statistic", "p.value")
+    names(model_summary) <- c("term", "coef", "Se", "statistic", "p.value",
+                              "conf.low", "conf.high")
 
     # Change the term from "(Intercept)" to "intercept"
     model_summary$term <- gsub("\\(Intercept\\)", "intercept", model_summary$term)
@@ -105,7 +136,7 @@ extract_sand_info <- function(model_outs) {
   return(model_info)
 }
 
-extract_cbc_info <- function(model_outs) {
+extract_cbc_info <- function(model_outs, level = 0.95) {
   # Initialize list to store model information
   model_info <- list()
 
@@ -122,12 +153,17 @@ extract_cbc_info <- function(model_outs) {
       p_values <- lapply(model_outs[[i]]$models, function(x) broom::tidy(x)[["p.value"]])
       median_p_values <- sapply(1:length(p_values[[1]]), function(j) stats::median(sapply(p_values, `[[`, j)))
 
+      # Extract the confidence intervals
+      conf_ints <- lapply(model_summary$ci_coef, function(x) x)
+
       # Construct a data frame with the summary information
       model_df <- data.frame(
         term = names(model_summary$mean_coef),
         coef = unlist(model_summary$mean_coef),
         Se = unlist(model_summary$se_coef),
-        p.value = unlist(median_p_values)
+        p.value = unlist(median_p_values),
+        conf.low = sapply(conf_ints, function(x) x[1]),
+        conf.high = sapply(conf_ints, function(x) x[2])
       )
 
       # Change the term from "(Intercept)" to "intercept"
@@ -144,7 +180,7 @@ extract_cbc_info <- function(model_outs) {
   return(model_info)
 }
 
-extract_cbcRR_info <- function(model_outs) {
+extract_cbcRR_info <- function(model_outs, level = 0.95) {  # add level here
   # Initialize list to store model information
   model_info <- list()
 
@@ -175,8 +211,14 @@ extract_cbcRR_info <- function(model_outs) {
       t_stat <- coefs / Ses
       pvalues <- 2 * stats::pt(-abs(t_stat), df = df)
 
+      # Compute confidence intervals
+      t.c <- stats::qt(1 - (1 - level) / 2, df = df, lower.tail = TRUE)  # corrected issue here
+      conf.low <- coefs - t.c * Ses
+      conf.high <- coefs + t.c * Ses
+
       # Create a data frame with the results
-      model_df <- data.frame(term = terms, coef = coefs, Se = Ses, p.value = pvalues)
+      model_df <- data.frame(term = terms, coef = coefs, Se = Ses, p.value = pvalues,
+                             conf.low = conf.low, conf.high = conf.high)  # added conf.low and conf.high here
 
       # Change the term from "(Intercept)" to "intercept"
       model_df$term <- gsub("\\(Intercept\\)", "intercept", model_df$term)

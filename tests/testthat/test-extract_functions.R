@@ -52,8 +52,8 @@ test_that("extract_sand_info works", {
 #   cbc_res <- extract_cbc_info(cbc_mods)
 #   expect_equal(length(cbc_res), 3)
 # })
-
-
+#
+#
 # test_that("extract_cbcRR_info works", {
 #   set.seed(123)
 #   sim_data <- LCGA_GMM_sim(n_pers = 100, n_time = 5, beta_int = 0, beta_slo_time = 1,
@@ -64,4 +64,4 @@ test_that("extract_sand_info works", {
 #   cbcRR_res <- extract_cbcRR_info(cbc_mods)
 #   expect_equal(length(cbc_res), 3)
 # })
-
+#
