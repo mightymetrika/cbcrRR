@@ -11,9 +11,9 @@ test_that("scenario_crossing returns correct output structure", {
   # Test each dataframe structure
   for (df in scenarios) {
     expect_s3_class(df, "data.frame")
-    expect_equal(ncol(df), 10)
-    expected_cols <- c("ID", "time", "covar", "int", "slo", "slo_cov", "slo_interact",
-                       "y", "mod_name", "interact")
+    expect_equal(ncol(df), 8)
+    expected_cols <- c("ID", "time", "covar", "int", "slo", "slo_cov",
+                       "y", "mod_name")
     expect_equal(colnames(df), expected_cols)
     expect_true(all(!is.na(df)))
   }
