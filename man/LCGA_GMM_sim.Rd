@@ -10,7 +10,6 @@ LCGA_GMM_sim(
   beta_int,
   beta_slo_time,
   beta_slo_covar,
-  beta_slo_interact,
   mean_i,
   var_i,
   mean_s,
@@ -18,6 +17,7 @@ LCGA_GMM_sim(
   cov_is,
   mean_r,
   var_r,
+  covar_noise = c(0, 0),
   mod_name = NA_character_
 )
 }
@@ -31,8 +31,6 @@ LCGA_GMM_sim(
 \item{beta_slo_time}{Fixed effect of time (slope) for the linear model.}
 
 \item{beta_slo_covar}{Fixed effect of the covariate for the linear model.}
-
-\item{beta_slo_interact}{Fixed effect of the time-covariate interaction for the linear model.}
 
 \item{mean_i}{Mean of the random intercepts.}
 
@@ -48,6 +46,9 @@ LCGA_GMM_sim(
 
 \item{var_r}{Variance of the Gaussian noise added to the response variable.}
 
+\item{covar_noise}{A vector to add Gaussian noise to the covar.  Default is
+c(0,0).}
+
 \item{mod_name}{A model identifier}
 }
 \value{
@@ -62,12 +63,12 @@ for use in latent class growth analysis and growth mixture modeling studies.
 It creates a dataset for a specified number of individuals (\code{n_pers}) and time points (\code{n_time}),
 each with a random intercept and slope derived from a multivariate normal distribution.
 The response variable at each time point for each individual is calculated using a linear model
-that includes the random intercept and slope, a covariate effect, and a time-covariate interaction effect.
+that includes the random intercept and slope, a covariate effect.
 Gaussian noise is added to this.
 }
 \examples{
 sim_data <- LCGA_GMM_sim(n_pers = 100, n_time = 5, beta_int = 0, beta_slo_time = 1,
-beta_slo_covar = 0, beta_slo_interact = 0, mean_i = 0, var_i = 1, mean_s = 0,
+beta_slo_covar = 0, mean_i = 0, var_i = 1, mean_s = 0,
 var_s = 1, cov_is = 0, mean_r = 0, var_r = 1)
 head(sim_data)
 }
