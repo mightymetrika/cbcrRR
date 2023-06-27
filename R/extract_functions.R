@@ -7,20 +7,32 @@ extract_lcga_info <- function(model_outs, level = 0.95) {
     # Get the summary of the model
     model_summary <- summary(model_outs[[i]])
 
-    # Calculate confidence intervals
-    model_ci <- stats::confint(model_outs[[i]], level = level)
-    model_ci <- stats::setNames(as.data.frame(model_ci), c("conf.low", "conf.high"))
-    row.names(model_ci) <- make.names(row.names(model_ci), unique = TRUE)
-    model_ci$term <- row.names(model_ci)
+    # Try to calculate confidence intervals
+    model_ci <- tryCatch(
+      {
+        ci <- stats::confint(model_outs[[i]], level = level)
+        ci <- stats::setNames(as.data.frame(ci), c("conf.low", "conf.high"))
+        row.names(ci) <- make.names(row.names(ci), unique = TRUE)
+        ci$term <- row.names(ci)
+        ci
+      },
+      error = function(e){
+        return(NULL)
+      }
+    )
 
-    # Convert summary to data.frame and add row names as 'term' column
-    model_summary <- data.frame(term = make.names(row.names(model_summary), unique = TRUE), model_summary)
+    if (!is.null(model_ci)) {
+      # Convert summary to data.frame and add row names as 'term' column
+      model_summary <- data.frame(term = make.names(row.names(model_summary), unique = TRUE), model_summary)
 
-    # Merge model_summary and model_ci
-    model_summary <- merge(model_summary, model_ci, by = "term")
+      # Merge model_summary and model_ci
+      model_summary <- merge(model_summary, model_ci, by = "term")
 
-    # Reorder the columns so that 'term' is the first column
-    model_summary <- model_summary[, c("term", setdiff(names(model_summary), "term"))]
+      # Reorder the columns so that 'term' is the first column
+      model_summary <- model_summary[, c("term", setdiff(names(model_summary), "term"))]
+    } else {
+      model_summary <- "model did not complete as expected."
+    }
 
     # Store the extracted information in the list
     model_info[[names(model_outs)[i]]] <- model_summary
@@ -40,29 +52,41 @@ extract_lme4_info <- function(model_outs, level = 0.95) {
     # Get the summary of the model
     model_summary <- summary(lmerTest::as_lmerModLmerTest(model_outs[[i]]))
 
-    # Extract fixed effects to data.frame and add row names as 'term' column
-    model_df <- as.data.frame(model_summary$coefficients)
-    model_df$term <- row.names(model_summary$coefficients)
+    # Try to calculate confidence intervals
+    model_ci <- tryCatch(
+      {
+        ci <- stats::confint(model_outs[[i]], level = level)
+        ci <- stats::setNames(as.data.frame(ci), c("conf.low", "conf.high"))
+        ci$term <- row.names(ci)
+        ci
+      },
+      error = function(e){
+        return(NULL)
+      }
+    )
 
-    # Calculate confidence intervals
-    model_ci <- stats::confint(model_outs[[i]], level = level)
-    model_ci <- stats::setNames(as.data.frame(model_ci), c("conf.low", "conf.high"))
-    model_ci$term <- row.names(model_ci)
+    if (!is.null(model_ci)) {
+      # Extract fixed effects to data.frame and add row names as 'term' column
+      model_df <- as.data.frame(model_summary$coefficients)
+      model_df$term <- row.names(model_summary$coefficients)
 
-    # Change the term from "(Intercept)" to "intercept"
-    model_df$term <- gsub("\\(Intercept\\)", "intercept", model_df$term)
-    model_ci$term <- gsub("\\(Intercept\\)", "intercept", model_ci$term)
+      # Change the term from "(Intercept)" to "intercept"
+      model_df$term <- gsub("\\(Intercept\\)", "intercept", model_df$term)
+      model_ci$term <- gsub("\\(Intercept\\)", "intercept", model_ci$term)
 
-    # Rename columns
-    names(model_df)[names(model_df) == "Estimate"] <- "coef"
-    names(model_df)[names(model_df) == "Std. Error"] <- "Se"
-    names(model_df)[names(model_df) == "Pr(>|t|)"] <- "p.value"
+      # Rename columns
+      names(model_df)[names(model_df) == "Estimate"] <- "coef"
+      names(model_df)[names(model_df) == "Std. Error"] <- "Se"
+      names(model_df)[names(model_df) == "Pr(>|t|)"] <- "p.value"
 
-    # Merge model_df and model_ci
-    model_df <- merge(model_df, model_ci, by = "term")
+      # Merge model_df and model_ci
+      model_df <- merge(model_df, model_ci, by = "term")
 
-    # Reorder the columns so that 'term' is the first column
-    model_df <- model_df[, c("term", setdiff(names(model_df), "term"))]
+      # Reorder the columns so that 'term' is the first column
+      model_df <- model_df[, c("term", setdiff(names(model_df), "term"))]
+    } else {
+      model_df <- "model did not complete as expected."
+    }
 
     # Store the extracted information in the list
     model_info[[names(model_outs)[i]]] <- model_df
