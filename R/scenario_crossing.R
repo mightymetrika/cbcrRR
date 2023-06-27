@@ -12,8 +12,6 @@
 #' is 0.
 #' @param beta_slo_time A vector of fixed effect(s) of time (slope) for the linear
 #' model. Default is c(0.1, 0.3, 0.5).
-#' @param beta_slo_covar A vector of fixed effect(s) of the covariate for the linear
-#' model. Default is c(0.25, 0.5).
 #' @param mean_i A vector of mean(s) of the random intercepts. Default is c(5, 10).
 #' @param var_i A vector of variance(s) of the random intercepts. Default is
 #' c(0.05, 0.13).
@@ -26,8 +24,6 @@
 #' variable. Default is 0.
 #' @param var_r A vector of variance(s) of the Gaussian noise added to the response
 #' variable. Default is c(1 , 1.2).
-#' @param covar_noise A list of Gaussian noise vectors to be added to the covariate.
-#' Default is list(c(0, 0), c(0,1)).
 #'
 #' @return A list of data frames, each representing a specific scenario. Each data
 #' frame includes simulated longitudinal data
@@ -45,30 +41,26 @@ scenario_crossing <- function(n_pers=c(50, 100),
                               n_time=c(3,4,5),
                               beta_int=c(0),
                               beta_slo_time=c(0.1, 0.3, 0.5),
-                              beta_slo_covar=c(0.25, 0.5),
                               mean_i=c(5, 10),
                               var_i=c(0.05, 0.13),
                               mean_s=c(0),
                               var_s=c(0.05, 0.09),
                               cov_is=c(0),
                               mean_r=c(0),
-                              var_r=c(1 , 1.2),
-                              covar_noise = list(c(0, 0), c(0,1))){
+                              var_r=c(1 , 1.2)){
 
 
   scenarios <- tidyr::crossing(n_pers=n_pers,
                                n_time=n_time,
                                beta_int=beta_int,
                                beta_slo_time=beta_slo_time,
-                               beta_slo_covar=beta_slo_covar,
                                mean_i=mean_i,
                                var_i=var_i,
                                mean_s=mean_s,
                                var_s=var_s,
                                cov_is=cov_is,
                                mean_r=mean_r,
-                               var_r=var_r,
-                               covar_noise = covar_noise)
+                               var_r=var_r)
 
   data_outs <- vector(mode = "list", #list to collect data frames
                       length = nrow(scenarios))
@@ -79,16 +71,13 @@ scenario_crossing <- function(n_pers=c(50, 100),
                          "_nt_", scenarios$n_time[[i]],
                          "_bint_", scenarios$beta_int[[i]],
                          "_bst_", scenarios$beta_slo_time[[i]],
-                         "_bsc_", scenarios$beta_slo_covar[[i]],
                          "_mi_", scenarios$mean_i[[i]],
                          "_vi_", scenarios$var_i[[i]],
                          "_ms_", scenarios$mean_s[[i]],
                          "_vs_", scenarios$var_s[[i]],
                          "_cis_", scenarios$cov_is[[i]],
                          "_mr_", scenarios$mean_r[[i]],
-                         "_vr_", scenarios$var_r[[i]],
-                         "_cnm_", scenarios$covar_noise[[i]][[1]],
-                         "_cnsd_", scenarios$covar_noise[[i]][[2]])
+                         "_vr_", scenarios$var_r[[i]])
 
     #Define data generating process and get dfs
     data_outs[[i]] <- LCGA_GMM_sim(
@@ -96,7 +85,6 @@ scenario_crossing <- function(n_pers=c(50, 100),
       n_time=scenarios$n_time[[i]],
       beta_int=scenarios$beta_int[[i]],
       beta_slo_time=scenarios$beta_slo_time[[i]],
-      beta_slo_covar=scenarios$beta_slo_covar[[i]],
       mean_i=scenarios$mean_i[[i]],
       var_i=scenarios$var_i[[i]],
       mean_s=scenarios$mean_s[[i]],
@@ -104,7 +92,6 @@ scenario_crossing <- function(n_pers=c(50, 100),
       cov_is=scenarios$cov_is[[i]],
       mean_r=scenarios$mean_r[[i]],
       var_r=scenarios$var_r[[i]],
-      covar_noise = scenarios$covar_noise[[i]],
       mod_name = model_name)
   }
   return(data_outs)
