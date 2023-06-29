@@ -1,4 +1,5 @@
-# test_that("multiplication works", {
-#   sim_res <- run_simulation_study(n_reps = 2)
-#   expect_equal(2 * 2, 4)
-# })
+test_that("Test that run simulation study works", {
+  # set.seed(287)
+  # rss_2r <- run_simulation_study(n_reps = 2)
+  expect_equal(length(rss_2r), 2)
+})
