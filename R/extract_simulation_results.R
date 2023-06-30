@@ -3,9 +3,6 @@ extract_simulation_results <- function(results) {
   # Initialize list to store summary stats
   summary_stats <- list()
 
-  # Counter for successful models
-  successful_models <- 0
-
   # Loop over each simulation repetition
   for (i in seq_along(results)) {
 
@@ -20,6 +17,21 @@ extract_simulation_results <- function(results) {
 
       # Get the true values for this scenario
       true_values <- scenario_results$true_values
+      mod_name <- unique(true_values$mod_name)
+      np <- stringr::str_match(mod_name, "np_\\s*(.*?)\\s*_nt_")[[2]] |> as.numeric()
+      nt <- stringr::str_match(mod_name, "_nt_\\s*(.*?)\\s*_bint_")[[2]] |> as.numeric()
+      bint <- stringr::str_match(mod_name, "_bint_\\s*(.*?)\\s*_bst_")[[2]]|> as.numeric()
+      bst <- stringr::str_match(mod_name, "_bst_\\s*(.*?)\\s*_mi_")[[2]] |> as.numeric()
+      mi <- stringr::str_match(mod_name, "_mi_\\s*(.*?)\\s*_vi_")[[2]] |> as.numeric()
+      vi <- stringr::str_match(mod_name, "_vi_\\s*(.*?)\\s*_ms_")[[2]] |> as.numeric()
+      ms <- stringr::str_match(mod_name, "_ms_\\s*(.*?)\\s*_vs_")[[2]] |> as.numeric()
+      vs <- stringr::str_match(mod_name, "_vs_\\s*(.*?)\\s*_cis_")[[2]] |> as.numeric()
+      cis <- stringr::str_match(mod_name, "_cis_\\s*(.*?)\\s*_mr_")[[2]] |> as.numeric()
+      mr <- stringr::str_match(mod_name, "_mr_\\s*(.*?)\\s*_vr_")[[2]] |> as.numeric()
+      vr <- sub(".*_vr_", "", mod_name) |> as.numeric()
+
+      tvs <- list(np = np, nt = nt, bint = bint, bst = bst, mi = mi, vi = vi,
+                  ms = ms, vs = vs, cis = cis, mr = mr, vr = vr)
 
       # Loop over each model for this scenario
       for (model_name in names(scenario_results)) {
@@ -30,46 +42,54 @@ extract_simulation_results <- function(results) {
           # Get the results for this model
           model_results <- scenario_results[[model_name]]
 
-          # Check if the model ran successfully
-          if (!is.character(model_results)) {
+          for(mod in names(model_results)) {
 
-            for(mod in names(model_results))
+            # Check if the model ran successfully
+            if (!is.character(model_results[[mod]])) {
 
-            # Calculate the RMSE
-            rmse <- sqrt(mean((model_results[[mod]]$coef[[2]] - true_values$slo)^2))
+              # Calculate errors
+              ierror <- model_results[[mod]]$coef[[1]] - tvs$bint
+              serror <- model_results[[mod]]$coef[[2]] - tvs$bst
 
-            # Calculate the absolute bias
-            abs_bias <- abs(mean(model_results[[mod]]$coef[[2]] - true_values$slo))   ###Stopped HERE###
+              # Calculate the 95% coverage
+              icover <- model_results[[mod]]$conf.low[[1]] <= tvs$bint & tvs$bint <= model_results[[mod]]$conf.high[[1]]
+              scover <- model_results[[mod]]$conf.low[[2]] <= tvs$bst & tvs$bst <= model_results[[mod]]$conf.high[[2]]
 
-            # Calculate the 95% coverage
-            coverage <- mean(model_results$conf.low <= true_values & true_values <= model_results$conf.high)
+              # Calculate the true standard deviation
+              u_true_values <- true_values |> dplyr::distinct(ID, .keep_all = TRUE)
+              itrue_sd <- stats::sd(u_true_values$int)
+              strue_sd <- stats::sd(u_true_values$slo)
 
-            # Calculate the true standard deviation
-            true_sd <- stats::sd(true_values)
+              # Calculate the estimated standard error
+              i_se <- model_results[[mod]]$Se[[1]]
+              s_se <- model_results[[mod]]$Se[[2]]
 
-            # Calculate the mean estimated standard error
-            mean_se <- mean(model_results$Std.Error)
+              # Calculate the error of standard error
+              i_se_error <- i_se - itrue_sd
+              s_se_error <- s_se - strue_sd
 
-            # Calculate power
-            power <- mean(model_results$p.value < 0.05)
+              # Calculate power
+              ipower <- model_results[[mod]]$p.value[[1]] < 0.05
+              spower <- model_results[[mod]]$p.value[[2]] < 0.05
 
-            # Increment the counter for successful models
-            successful_models <- successful_models + 1
+              # # Counter for successful models
+              success <- 1
 
-            # Store summary stats for this model
-            summary_stats[[paste0(i, "_", j, "_", model_name)]] <-
-              list(rmse = rmse, abs_bias = abs_bias, coverage = coverage,
-                   true_sd = true_sd, mean_se = mean_se, power = power)
+              # Store summary stats for this model
+              summary_stats[[paste0(model_name, "_", mod, "_", i, "_", j)]] <-
+                list(ierror = ierror, serror = serror, icover = icover,
+                     scover = scover, itrue_sd = itrue_sd, strue_sd = strue_sd,
+                     i_se = i_se, s_se = s_se, i_se_error= i_se_error,
+                     s_se_error = s_se_error, ipower = ipower, spower = spower,
+                     success = success, tvs = tvs)
+
+            }
 
           }
-
         }
-
       }
-
     }
-
   }
-
-  return(list(summary_stats = summary_stats, successful_models = successful_models))
+  return(summary_stats)
 }
+
