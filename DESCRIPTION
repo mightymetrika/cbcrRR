@@ -14,12 +14,14 @@ BugReports: https://github.com/mightymetrika/cbcrRR/issues
 Imports: 
     broom,
     dplyr,
+    ggplot2,
     lcmm,
     lme4,
     lmerTest,
     lmtest,
     MASS,
     OLStrajr (>= 0.1.0.9000),
+    rlang,
     sandwich,
     stringr,
     tidyr

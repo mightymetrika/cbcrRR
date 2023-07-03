@@ -1,4 +1,3 @@
 test_that("multiplication works", {
-  ext_res <- extract_simulation_results(results = rss_2r)
-  expect_equal(length(ext_res), 4385)
+  expect_equal(length(esr_rss_2r), 4385)
 })

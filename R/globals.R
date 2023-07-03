@@ -1,3 +1,3 @@
 globalVariables(c(
-  "ID"
+  "ID", "model"
 ))
