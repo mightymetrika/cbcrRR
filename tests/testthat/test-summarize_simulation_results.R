@@ -1,5 +1,4 @@
-# test_that("Test that summarize_simulation_results works", {
-#   ext_res <- extract_simulation_results(results = rss_2r)
-#   sum_res <- summarize_simulation_results(results = ext_res)
-#   expect_equal(2 * 2, 4)
-# })
+test_that("Test that summarize_simulation_results works", {
+  expect_equal(nrow(ssr_rss_2r), 2281)
+  expect_equal(ncol(ssr_rss_2r), 32)
+})
